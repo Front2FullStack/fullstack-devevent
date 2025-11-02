@@ -1,4 +1,4 @@
-import { Schema, model, models, Document, Types } from 'mongoose';
+import mongoose, { Schema, model, models, Document, Types } from 'mongoose';
 import Event from './event.model';
 
 // TypeScript interface for Booking document
@@ -37,38 +37,33 @@ const BookingSchema = new Schema<IBooking>(
 );
 
 // Pre-save hook to validate events exists before creating booking
+// Pre-save hook to validate events exists before creating booking
 BookingSchema.pre('save', async function (next) {
     const booking = this as IBooking;
-
     // Only validate eventId if it's new or modified
     if (booking.isModified('eventId') || booking.isNew) {
         try {
             const eventExists = await Event.findById(booking.eventId).select('_id');
-
             if (!eventExists) {
-                const validationError = booking.invalidate(
+                booking.invalidate(
                     'eventId',
                     `Event with ID ${booking.eventId} does not exist`,
                     booking.eventId
                 );
-                return next(validationError);
+                return next(new mongoose.Error.ValidationError(booking));
             }
         } catch {
-            const validationError = booking.invalidate(
+            booking.invalidate(
                 'eventId',
                 'Invalid event ID format or database error',
                 booking.eventId
             );
-            return next(validationError);
+            return next(new mongoose.Error.ValidationError(booking));
         }
     }
-
     next();
 });
-    }
 
-    next();
-});
 
 // Create index on eventId for faster queries
 BookingSchema.index({ eventId: 1 });
