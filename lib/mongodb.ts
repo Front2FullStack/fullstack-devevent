@@ -10,12 +10,6 @@ import mongoose, { Mongoose } from "mongoose";
 // The connection string must be provided via environment variables.
 const MONGODB_URI = process.env.MONGODB_URI || '';
 
-if (!MONGODB_URI || MONGODB_URI.length === 0) {
-  throw new Error(
-    "Invalid/Missing environment variable: 'MONGODB_URI'. Please set it in your .env file."
-  );
-}
-
 // Optionally set global Mongoose behavior here (aligns with Mongoose 7+ best practices)
 mongoose.set("strictQuery", true);
 
@@ -58,6 +52,12 @@ export async function connectToDatabase(): Promise<Mongoose> {
   }
 
   if (!cached.promise) {
+
+      if (!MONGODB_URI || MONGODB_URI.length === 0) {
+          throw new Error(
+              "Invalid/Missing environment variable: 'MONGODB_URI'. Please set it in your .env file."
+          );
+      }
     // Configure connection options suitable for typical production usage.
     const opts = {
       // Keep the pool modest unless you expect high concurrency.
