@@ -44,7 +44,7 @@ export default function RootLayout({
                 distortion={0.01}
             />
         </div>
-        <main>
+        <main className="relative z-2">
         {children}
         </main>
       </body>
