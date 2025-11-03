@@ -3,6 +3,7 @@ import {v2 as cloudinary} from 'cloudinary';
 
 import Event from '@/database/event.model';
 import {connectToDatabase} from "@/lib/mongodb";
+import {revalidateTag} from "next/cache";
 
 export async function POST(req: NextRequest) {
     try {
@@ -35,8 +36,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({message: 'File size exceeds 5MB limit'}, {status: 400})
         }
 
-        // let tags = JSON.parse(formData.get('tags') as string);
-        // let agenda = JSON.parse(formData.get('agenda') as string);
+        const tags = JSON.parse(formData.get('tags') as string);
+        const agenda = JSON.parse(formData.get('agenda') as string);
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
@@ -53,8 +54,10 @@ export async function POST(req: NextRequest) {
 
         const createdEvent = await Event.create({
             ...event,
+            tags: tags,
+            agenda: agenda,
         });
-        console.log(createdEvent);
+        revalidateTag('all-events','hours')
 
         return NextResponse.json({message: 'Event created successfully', event: createdEvent}, {status: 201});
     } catch (e) {
@@ -65,6 +68,8 @@ export async function POST(req: NextRequest) {
         }, {status: 500})
     }
 }
+
+export default POST
 
 export async function GET() {
     try {
