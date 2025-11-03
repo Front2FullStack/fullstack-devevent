@@ -16,7 +16,7 @@ const Page = async () => {
        throw new Error(`Failed to fetch events: ${res.status}`);
     }
     const {events} = await res.json();
-    console.log(events)
+
     const allEvents = Array.isArray(events) ? events : [];
 
     return (
@@ -28,7 +28,7 @@ const Page = async () => {
                 <h3>Featured Events</h3>
                 <ul className="events ">
                     {allEvents && allEvents.length > 0 && allEvents.map((event: IEvent) => (<li className="list-none" key={event.slug}>
-                        <EventCard {...event}/>
+                        <EventCard key={event.slug} {...event}/>
                     </li>))}
                 </ul>
             </div>

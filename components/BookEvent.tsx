@@ -1,33 +1,52 @@
 'use client'
 import {useState, FormEvent} from 'react'
+import {createBookingPayload} from "@/lib/actions/booking.actions";
+import posthog from "posthog-js";
 
-const BookEvent = () => {
+interface IProps {
+    eventId: string;
+    slug: string;
+}
+const BookEvent = ({eventId, slug}: IProps) => {
     const [email, setEmail] = useState<string>('');
     const [submitted, setSubmitted] = useState<boolean>(false);
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setTimeout(() => setSubmitted(true), 1000)
+        const {success} = await createBookingPayload({eventId, slug, email})
+
+        if(success) {
+            setSubmitted(true)
+            posthog.capture('event_booked', {eventId, slug, email})
+        } else {
+            console.error('Booking creation failed:');
+            posthog.captureException('Booking creation failed')
+        }
     }
 
 
     return (
         <div id="book-event">
-            {submitted ? <p className="text-sm" role="status" aria-live="polite">Thank you for signing up!</p> : (<form onSubmit={handleSubmit}>
-                <div className="flex flex-col">
-                    <label htmlFor="email">Email Address</label>
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        required={true}
-                        aria-required={true}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <button className="button-submit" type="submit">Sign Up</button>
-            </form>)}
+            {submitted ? (
+                <p className="text-sm" role="status" aria-live="polite">Thank you for signing up!</p>
+            ): (
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="email">Email Address</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            id="email"
+                            placeholder="Enter your email address"
+                            required
+                            aria-required="true"
+                        />
+                    </div>
+
+                    <button type="submit" className="button-submit">Submit</button>
+                </form>
+            )}
         </div>
     )
 }
