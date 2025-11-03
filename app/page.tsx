@@ -1,11 +1,17 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
-import {allEvents} from "@/lib/constants";
+import {IEvent} from "@/database";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+if (!BASE_URL) {
+  throw new Error('NEXT_PUBLIC_BASE_URL environment variable is not defined');
+}
 
 
-
-
-const Page = () => {
+const Page = async () => {
+    const res = await fetch(`${BASE_URL}/api/events`);
+    const {events} = await res.json();
     return (
         <section>
             <h1 className="text-center">The Hub for Every Dev <br/> Event you can&apos;t miss</h1>
@@ -14,7 +20,7 @@ const Page = () => {
             <div className="mt-20 space-y-7">
                 <h3>Featured Events</h3>
                 <ul className="events">
-                    {allEvents.map((event) => (<li key={event.title}>
+                    {events && events.length > 0 && events.map((event: IEvent) => (<li key={event.slug}>
                         <EventCard {...event}/>
                     </li>))}
                 </ul>

@@ -1,4 +1,4 @@
-import { Schema, model, models, Document } from 'mongoose';
+import {Schema, model, models, Document} from 'mongoose';
 
 // TypeScript interface for Event document
 export interface IEvent extends Document {
@@ -179,10 +179,10 @@ function normalizeTime(timeString: string): string {
 }
 
 // Create unique index on slug for better performance
-EventSchema.index({ slug: 1 }, { unique: true });
+EventSchema.index({slug: 1}, {unique: true});
 
 // Create compound index for common queries
-EventSchema.index({ date: 1, mode: 1 });
+EventSchema.index({date: 1, mode: 1});
 
 const Event = models.Event || model<IEvent>('Event', EventSchema);
 
