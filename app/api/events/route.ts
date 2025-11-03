@@ -69,8 +69,6 @@ export async function POST(req: NextRequest) {
     }
 }
 
-export default POST
-
 export async function GET() {
     try {
         await connectToDatabase();

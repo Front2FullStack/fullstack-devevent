@@ -4,7 +4,7 @@ import {connectToDatabase} from '@/lib/mongodb';
 
 /**
  * GET /api/events/[slug]
- * Fetches a single events by its slug
+ * Fetches an event by its slug
  */
 
 type routeParams = {
